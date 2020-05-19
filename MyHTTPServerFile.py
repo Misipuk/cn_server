@@ -3,7 +3,8 @@ import socket
 import threading
 import traceback
 
-from HandlerFile import Handler, b64_encode
+from HandlerFile import Handler
+from TokenFile import b64_encode
 from RequestParserFile import RequestParser
 from ResponseFile import Response
 
@@ -69,6 +70,8 @@ class MyHTTPServer:
                 req.rfile.close()
                 conn.close()
 
+
+    #Makes headers and sends response
     def send_response(self, conn, resp):
         wfile = conn.makefile('wb')
         status_line = f'HTTP/1.1 {resp.status} {resp.reason}\r\n'

@@ -7,101 +7,10 @@ from typing import Dict, Optional, Union
 from HTTPErrorFile import HTTPError
 from RequestFile import Request
 from ResponseFile import Response
-
-secret = "jdfkgahlskjhflkj2y3iy187 2rofiulh"
-
-
-def sha256(s: str) -> bytes:
-    m = hashlib.sha256()
-    m.update(s.encode())
-    return m.digest()
+from TokenFile import Token
+from UsersFile import User, Users
 
 
-def b64_encode(b: bytes) -> bytes:
-    return base64.urlsafe_b64encode(b)
-
-
-def b64_decode(s: str) -> bytes:
-    return base64.urlsafe_b64decode(s.encode())
-
-
-class Token:
-    login: str
-    expire: int
-    key: str
-
-    def __init__(self, login: str, expire: int):
-        self.login = login
-        self.expire = expire
-        self.key = b64_encode(sha256(login + "|" + str(expire) + "|" + secret)).decode()
-
-    @staticmethod
-    def as_token(authorization: str) -> Optional[str]:
-        decoded = b64_decode(authorization).decode()
-        d = json.loads(decoded)
-        expected_key = Token(d["login"], d["expire"]).key
-
-        if d["key"] != expected_key:
-            raise Exception("invalid key")
-        if d["expire"] < int(time.time()):
-            raise Exception("token expired")
-
-        return d["login"]
-
-    @staticmethod
-    def as_authorization(login: str, expire: int) -> str:
-        token = Token(login, expire)
-        token = json.dumps(token.__dict__)
-        return b64_encode(token.encode()).decode()
-
-
-class User:
-    id: int
-    login: str
-    # TODO: keep hashed?
-    password: str
-
-    def copy(self):
-        u = User()
-        u.id = self.id
-        u.login = self.login
-        u.password = self.password
-        return u
-
-
-class Users:
-    # user_id -> User
-    _users: Dict[int, User]
-    # login -> user_id
-    _users_login: Dict[str, int]
-
-    def __init__(self):
-        self._users = {}
-        self._users_login = {}
-
-    def get(self, uid: int) -> Optional[User]:
-        uu = self._users.get(uid)
-        return Users._copy_if_none(uu)
-
-    def get_by_login(self, login: str) -> Optional[User]:
-        uid = self._users_login.get(login)
-        return self.get(uid) if uid is not None else None
-
-    def put(self, user: User) -> int:
-        if user.id is None:
-            user.id = len(self._users) + 1
-
-        self._users[user.id] = user
-        self._users_login[user.login] = user.id
-
-        return user.id
-
-    @staticmethod
-    def _copy_if_none(user):
-        if user is not None:
-            return user.copy()
-        else:
-            return None
 
 
 class Handler:
@@ -147,17 +56,8 @@ class Handler:
 
     def handle_get_users(self, req, user_login: str):
         accept = req.headers.get('Accept')
-        if 'text/html' in accept:
-            contentType = 'text/html; charset=utf-8'
-            body = '<html><head></head><body>'
-            body += f'<div>Пользователи ({len(self._users._users)})</div>'
-            body += '<ul>'
-            for u in self._users._users.values():
-                body += f'<li>#{u["id"]} {u["login"]}, {u["age"]}</li>'
-            body += '</ul>'
-            body += '</body></html>'
 
-        elif 'application/json' in accept:
+        if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
             body = json.dumps(self._users.__dict__)
 
@@ -176,13 +76,7 @@ class Handler:
             raise HTTPError(404, 'Not found')
 
         accept = req.headers.get('Accept')
-        if 'text/html' in accept:
-            contentType = 'text/html; charset=utf-8'
-            body = '<html><head></head><body>'
-            body += f'#{user["id"]} {user["name"]}, {user["age"]}'
-            body += '</body></html>'
-
-        elif 'application/json' in accept:
+        if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
             body = json.dumps(user)
 
