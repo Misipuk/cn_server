@@ -1,5 +1,6 @@
 from typing import Dict, Optional, Union
 from MediaFileClass import MediaFile, MediaFiles
+
 class Cafe:
     id: int
     owner: str  #ownerlogin
@@ -8,7 +9,10 @@ class Cafe:
     photos: MediaFiles('p')
     videos: MediaFiles('v')
     description: str
-    reviews: []
+#    reviews: []  легко достать в базе
+
+    def __init__(self):
+        pass
 
     def copy(self):
         c = Cafe()
@@ -31,13 +35,13 @@ class Cafes:
         self._cafes = {}
         self._owner_login = {}
 
-    def get(self, uid: int) -> Optional[Cafe]:
-        cc = self._cafes.get(uid)
+    def get(self, cid: int) -> Optional[Cafe]:
+        cc = self._cafes.get(cid)
         return Cafes._copy_if_none(cc)
 
     def get_by_login(self, login: str) -> Optional[Cafe]:
-        uid = self._owner_login.get(login)
-        return self.get(uid) if uid is not None else None
+        cid = self._owner_login.get(login)
+        return self.get(cid) if cid is not None else None
 
     def put(self, cafe: Cafe) -> int:
         if cafe.id is None:

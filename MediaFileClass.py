@@ -2,39 +2,62 @@ from typing import Dict, Optional, Union
 
 class MediaFile:
     id: int
+    cafeid: int
     bcode: int
+
+    def __init__(self):
+        pass
 
     def copy(self):
         mf = MediaFile()
         mf.id = self.id
+        mf.cafeid = self.cafeid
         mf.bcode = self.bcode
         return mf
 
 class MediaFiles:
-    owner: int #cafeid
-    det: str #photo or video
-    # file_id -> File
-    _files: Dict[int, MediaFile]
+    det: str #photo or video           folder photos or videos
+    # cafe_id -> list of MediaFiles
+    _cafe_files: Dict[int, list[MediaFile]]
+    _all_files: list[MediaFile]
 
 
-    def __init__(self, det:str):
-        self._files = {}
+    def __init__(self, cafeid_owner: int, det:str):
         self.det = det
+        self._cafe_files = {}
+        self._all_files = []
 
-    def get(self, fid: int) -> Optional[MediaFile]:
-        cc = self._files.get(fid)
-        return MediaFiles._copy_if_none(cc)
+    def get(self, cid: int) -> Optional[list[MediaFile]]:
+        mfl = self._cafe_files.get(cid)
+        return MediaFiles._copy_if_none(mfl)
 
     def put(self, mf: MediaFile) -> int:
-        if MediaFile.id is None:
-            MediaFile.id = len(self._files) + 1
+        if mf.id is None:
+            if self._all_files is not None:
+                mf.id = self._all_files[-1].id + 1
+            else:
+                mf.id = 1
+
+        #To list
+        if self._all_files is not None:
+            self._all_files.append(mf)
+        else:
+            self._all_files = [mf]
+
         #To dict
-        self._files[mf.id] = mf
+        if self._cafe_files.get(mf.cafeid) is not None:
+            self._cafe_files[mf.cafeid] = self._cafe_files[mf.cafeid] + [mf]
+        else:
+            self._cafe_files[mf.cafeid] = [mf]
+
         return mf.id
 
     @staticmethod
-    def _copy_if_none(mf):
+    def _copy_if_none(mf: list[MediaFile]):
         if mf is not None:
-            return mf.copy()
+            mf1 = []
+            for f in mf:
+                mf1.append(f.copy())
+            return mf1
         else:
             return None

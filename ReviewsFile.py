@@ -4,46 +4,76 @@ class Review:
     id: int
     owner: str  #ownerlogin
     cafeid: int
-    description: str
+    time: int
+    description: str #login, review
+
+    def __init__(self):
+        pass
 
     def copy(self):
         r = Review()
         r.id = self.id
         r.owner = self.owner
         r.cafeid = self.cafeid
+        r.time = self.time
         r.description = self.description
         return r
 
+
 class Rewiews:
-    # cafe_id -> ReviewsList
-    _rewiews: Dict[int, ]
-    # login -> cafe_id
-    _owner_login: Dict[str, int]
+    # cafe_id -> Reviews
+    _cafe_rewiews: Dict[int, list[Review]]
+    # user_login -> UserReviews
+    _login_reviews: Dict[str, list[Review]]
+    _allreviews = list[Review]
 
     def __init__(self):
-        self._cafes = {}
-        self._owner_login = {}
+        self._cafe_rewiews = {}
+        self._login_reviews = {}
+        self._allreviews = []
 
-    def get(self, uid: int) -> Optional[Cafe]:
-        cc = self._cafes.get(uid)
-        return Cafes._copy_if_none(cc)
+    def get_by_cafe(self, cid: int) -> Optional[list[Review]]:
+        rvs = self._cafe_rewiews.get(cid)
+        return Rewiews._copy_if_none(rvs) if rvs is not None else None
 
-    def get_by_login(self, login: str) -> Optional[Cafe]:
-        uid = self._owner_login.get(login)
-        return self.get(uid) if uid is not None else None
+    #Доделать
+    def get_by_login(self, login: str) -> Optional[list[Review]]:
+        rvs = self._login_reviews.get(login)
+        return Rewiews._copy_if_none(rvs) if rvs is not None else None
 
-    def put(self, cafe: Cafe) -> int:
-        if cafe.id is None:
-            cafe.id = len(self._cafes) + 1
+    def put(self, review: Review) -> int:
+        if review.id is None:
+            if self._allreviews is not None:
+                review.id = self._allreviews[-1].id + 1
+            else:
+                review.id = 1
+
+        #To list
+        if self._allreviews is not None:
+            self._allreviews.append(review)
+        else:
+            self._allreviews = [review]
+
+
         #To dict
-        self._cafes[cafe.id] = cafe
-        self._owner_login[cafe.login] = cafe.id
+        if self._cafe_rewiews.get(review.cafeid) is not None:
+            self._cafe_rewiews[review.cafeid] = self._cafe_rewiews[review.cafeid] + [review]
+        else:
+            self._cafe_rewiews[review.cafeid] = [review]
 
-        return cafe.id
+        if self._login_reviews.get(review.owner) is not None:
+            self._login_reviews[review.owner] = self._login_reviews[review.owner] + [review]
+        else:
+            self._login_reviews[review.owner] = [review]
+        return review.id
+
 
     @staticmethod
-    def _copy_if_none(cafe):
-        if cafe is not None:
-            return cafe.copy()
+    def _copy_if_none(rvs: list[Review]):
+        if rvs is not None:
+            rvs1 = []
+            for r in rvs:
+                rvs1.append(r.copy())
+            return rvs1
         else:
             return None
