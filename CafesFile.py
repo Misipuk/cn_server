@@ -6,13 +6,19 @@ class Cafe:
     owner: str  #ownerlogin
     name: str
     city: str
-    photos: MediaFiles('p')
-    videos: MediaFiles('v')
+#    photos: MediaFiles('p')  в базе?
+#    videos: MediaFiles('v')
     description: str
 #    reviews: []  легко достать в базе
 
     def __init__(self):
         pass
+
+    def __init__(self, owner:str, name:str, des: str, city: str):
+        self.owner = owner
+        self.name = name
+        self.des = des
+
 
     def copy(self):
         c = Cafe()
@@ -20,8 +26,8 @@ class Cafe:
         c.owner = self.owner
         c.name = self.name
         c.city = self.city
-        c.photos = self.photos
-        c.videos = self.videos
+        #c.photos = self.photos
+        #c.videos = self.videos
         c.details = self.details
         return c
 
@@ -34,6 +40,13 @@ class Cafes:
     def __init__(self):
         self._cafes = {}
         self._owner_login = {}
+        c1 = Cafe('PizzaOwner', 'PizzaDay', 'Очень вкусная пицца', 'Днепр')
+        c2 = Cafe('PubOwner', 'Duck Pub', 'У нас классный чай', 'Киев')
+        c3 = Cafe('SushiOwner', 'Sushi Iz Karasya', 'Только японские морепродукты', 'Черкасы')
+        self.put(c1)
+        self.put(c2)
+        self.put(c3)
+
 
     def get(self, cid: int) -> Optional[Cafe]:
         cc = self._cafes.get(cid)
@@ -51,6 +64,7 @@ class Cafes:
         self._owner_login[cafe.login] = cafe.id
 
         return cafe.id
+
 
     @staticmethod
     def _copy_if_none(cafe):

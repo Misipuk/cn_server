@@ -29,6 +29,8 @@ class MediaFiles:
 
     def get(self, cid: int) -> Optional[list[MediaFile]]:
         mfl = self._cafe_files.get(cid)
+        # image_data = open('photos/'+mf.id, 'rb')
+        # bytes = image_data.read()
         return MediaFiles._copy_if_none(mfl)
 
     def put(self, mf: MediaFile) -> int:
@@ -37,7 +39,8 @@ class MediaFiles:
                 mf.id = self._all_files[-1].id + 1
             else:
                 mf.id = 1
-
+        # image_data = open('photos/'+mf.id, 'rb')
+        # bytes = image_data.write() ?
         #To list
         if self._all_files is not None:
             self._all_files.append(mf)
@@ -51,6 +54,15 @@ class MediaFiles:
             self._cafe_files[mf.cafeid] = [mf]
 
         return mf.id
+
+    def delete_by_cafeid(self, cafeid:int, fileid:int):
+        for mf in self._all_files:
+            if mf.id == fileid and mf.cafeid == cafeid:
+                self._cafe_files.get(mf.cafeid).remove(mf)  # QUESTION
+                self._all_files.remove(mf)
+                return 1
+            else:
+                return -1
 
     @staticmethod
     def _copy_if_none(mf: list[MediaFile]):

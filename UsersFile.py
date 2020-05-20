@@ -10,8 +10,7 @@ class User:
     def __init__(self):
         pass
 
-    def __init__(self, id: int, login: str, password: str):
-        self.id = id
+    def __init__(self, login: str, password: str):
         self.login = login
         self.owner_cafeid = -1
         self.password = password
@@ -35,16 +34,20 @@ class Users:
     def __init__(self):
         self._users = {}
         self._users_login = {}
-        u1 = User(1, 'PizzaOwner', 'lovepizza1')
-        u2 = User(2, 'PubOwner', 'lovepub1')
-        u3 = User(3, 'SushiOwner', 'lovesushi1')
-        u4 = User(4, 'VasyaPupkin', 'lovepupok1')
-        u5 = User(5, 'PanAleha', 'loveAleha1')
+        u1 = User('PizzaOwner', 'lovepizza1')
+        u2 = User('PubOwner', 'lovepub1')
+        u3 = User('SushiOwner', 'lovesushi1')
+        u4 = User('VasyaPupkin', 'lovepupok1')
+        u5 = User('PanAleha', 'loveAleha1')
+        u6 = User('LesyaSuper', 'loveLesya1')
+        u7 = User('MrMops', 'loveMops1')
         self.put(u1);
         self.put(u2);
         self.put(u3);
         self.put(u4);
         self.put(u5);
+        self.put(u6);
+        self.put(u7);
 
 
     def get(self, uid: int) -> Optional[User]:
