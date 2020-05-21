@@ -39,12 +39,85 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_users(req, user_login)
 
+        #TODO
+        if req.path == '/cafes' and req.method == 'GET': #withMeanStars
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_get_cafes(req)
+
+        if req.path == '/cafemedia' and req.method == 'GET':#WithReviews
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_get_cafe_media(req)
+
+        if req.path == '/delcafemedia' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_edit_cafe(req)
+
+        if req.path == '/createcafe' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_create_cafe(req)
+
+        if req.path == '/editcafe' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_edit_cafe(req)
+
+
+        if req.path == '/addreview' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_add_review(req)
+
+        if req.path == '/delreview' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_del_review(req)
+
         if req.path.startswith('/users/'):
             user_id = req.path[len('/users/'):]
             if user_id.isdigit():
                 return self.handle_get_user(req, user_id)
 
         raise HTTPError(404, 'Not found')
+
+     #TODO
+    def handle_get_cafes(self, req):
+        accept = req.headers.get('Accept')
+
+        if 'application/json' in accept:
+            contentType = 'application/json; charset=utf-8'
+            body = json.dumps(self._users.__dict__)
+        else:
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
+            return Response(406, 'Not Acceptable')
+
+        body = body.encode('utf-8')
+        headers = [('Content-Type', contentType),
+                   ('Content-Length', len(body))]
+        return Response(200, 'OK', headers, body)
+
+    def handle_get_cafe_media(self, req):
+        pass
+
+    def handle_create_cafe(self, req):
+        pass
+
+    def handle_edit_cafe(self, req):
+        pass
+
+    def handle_del_cafe_media(self, req):
+        pass
+
+    def handle_add_review(self, req):
+        pass
+
+    def handle_del_review(self, req):
+        pass
+
+
 
     def handle_post_users(self, req):
         user = self.read_user_from_request_body(req)

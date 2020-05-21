@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 class MediaFile:
     id: int
@@ -18,8 +18,8 @@ class MediaFile:
 class MediaFiles:
     det: str #photo or video           folder photos or videos
     # cafe_id -> list of MediaFiles
-    _cafe_files: Dict[int, list[MediaFile]]
-    _all_files: list[MediaFile]
+    _cafe_files: Dict[int, List[MediaFile]]
+    _all_files: List[MediaFile]
 
 
     def __init__(self, cafeid_owner: int, det:str):

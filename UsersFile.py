@@ -1,9 +1,10 @@
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
+
 
 class User:
     id: int
     login: str
-    owner_cafeid: int
+    owner_cafeid: int = -1
     # TODO: keep hashed?
     password: str
 
@@ -11,6 +12,7 @@ class User:
         pass
 
     def __init__(self, login: str, password: str):
+        self.id = None
         self.login = login
         self.owner_cafeid = -1
         self.password = password
@@ -29,11 +31,12 @@ class Users:
     _users: Dict[int, User]
     # login -> user_id
     _users_login: Dict[str, int]
-    _all_users: list[User]
+    _all_users: List[User]
 
     def __init__(self):
         self._users = {}
         self._users_login = {}
+        self._all_users = []
         u1 = User('PizzaOwner', 'lovepizza1')
         u2 = User('PubOwner', 'lovepub1')
         u3 = User('SushiOwner', 'lovesushi1')
@@ -41,13 +44,13 @@ class Users:
         u5 = User('PanAleha', 'loveAleha1')
         u6 = User('LesyaSuper', 'loveLesya1')
         u7 = User('MrMops', 'loveMops1')
-        self.put(u1);
-        self.put(u2);
-        self.put(u3);
-        self.put(u4);
-        self.put(u5);
-        self.put(u6);
-        self.put(u7);
+        self.put(u1)
+        self.put(u2)
+        self.put(u3)
+        self.put(u4)
+        self.put(u5)
+        self.put(u6)
+        self.put(u7)
 
 
     def get(self, uid: int) -> Optional[User]:
@@ -60,10 +63,11 @@ class Users:
 
     def put(self, user: User) -> int:
         if user.id is None:
-            if self._all_users is not None:
+            if len(self._all_users) != 0:
                 user.id = self._all_users[-1].id + 1
             else:
                 user.id = 1
+
         #To dict
         self._users[user.id] = user
         self._users_login[user.login] = user.id

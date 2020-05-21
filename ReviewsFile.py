@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, List, Union
 
 class Review:
     id: int
@@ -12,6 +12,7 @@ class Review:
         pass
 
     def __init__(self, owner: str, cafeid: int, stars:int, desc: str):
+        self.id = None
         self.owner = owner
         self.cafeid = cafeid
         self.stars = stars
@@ -30,10 +31,10 @@ class Review:
 
 class Rewiews:
     # cafe_id -> Reviews
-    _cafe_rewiews: Dict[int, list[Review]]
+    _cafe_rewiews: Dict[int, List[Review]]
     # user_login -> UserReviews
-    _login_reviews: Dict[str, list[Review]]
-    _allreviews = list[Review]
+    _login_reviews: Dict[str, List[Review]]
+    _allreviews = List[Review]
 
     def __init__(self):
         self._cafe_rewiews = {}
@@ -72,7 +73,7 @@ class Rewiews:
                 review.id = 1
 
         #To list
-        if self._allreviews is not None:
+        if len(self._allreviews) != 0:
             self._allreviews.append(review)
         else:
             self._allreviews = [review]

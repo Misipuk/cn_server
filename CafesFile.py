@@ -15,6 +15,7 @@ class Cafe:
         pass
 
     def __init__(self, owner:str, name:str, des: str, city: str):
+        self.id = None
         self.owner = owner
         self.name = name
         self.des = des
@@ -55,6 +56,12 @@ class Cafes:
     def get_by_login(self, login: str) -> Optional[Cafe]:
         cid = self._owner_login.get(login)
         return self.get(cid) if cid is not None else None
+
+    def edit(self, cafe: Cafe) -> Optional[Cafe]:
+        c = self._cafes.get(cafe.id)
+        c.name = cafe.name
+        c.description = cafe.description
+        return self.get(cafe.id) if cafe.id is not None else None
 
     def put(self, cafe: Cafe) -> int:
         if cafe.id is None:
