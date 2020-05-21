@@ -4,24 +4,18 @@ from typing import Dict, List, Optional, Union
 class User:
     id: int
     login: str
-    owner_cafeid: int = -1
     # TODO: keep hashed?
     password: str
 
-    def __init__(self):
-        pass
-
-    def __init__(self, login: str, password: str):
+    def __init__(self, login: str = '', password: str = ''):
         self.id = None
         self.login = login
-        self.owner_cafeid = -1
         self.password = password
 
     def copy(self):
         u = User()
         u.id = self.id
         u.login = self.login
-        u.owner_cafeid = self.owner_cafeid
         u.password = self.password
         return u
 
@@ -37,21 +31,6 @@ class Users:
         self._users = {}
         self._users_login = {}
         self._all_users = []
-        u1 = User('PizzaOwner', 'lovepizza1')
-        u2 = User('PubOwner', 'lovepub1')
-        u3 = User('SushiOwner', 'lovesushi1')
-        u4 = User('VasyaPupkin', 'lovepupok1')
-        u5 = User('PanAleha', 'loveAleha1')
-        u6 = User('LesyaSuper', 'loveLesya1')
-        u7 = User('MrMops', 'loveMops1')
-        self.put(u1)
-        self.put(u2)
-        self.put(u3)
-        self.put(u4)
-        self.put(u5)
-        self.put(u6)
-        self.put(u7)
-
 
     def get(self, uid: int) -> Optional[User]:
         uu = self._users.get(uid)
@@ -68,10 +47,10 @@ class Users:
             else:
                 user.id = 1
 
-        #To dict
+        # To dict
         self._users[user.id] = user
         self._users_login[user.login] = user.id
-        #To_list
+        # To_list
         self._all_users.append(user)
 
         return user.id

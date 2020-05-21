@@ -1,22 +1,24 @@
-import base64
-import hashlib
 import json
 import time
-from typing import Dict, Optional, Union
+from typing import Union, Optional
 
+from CafesFile import Cafe, Cafes
 from HTTPErrorFile import HTTPError
+from MediaFileClass import MediaFile, MediaFiles
 from RequestFile import Request
 from ResponseFile import Response
+from ReviewsFile import Review, Reviews, now
 from TokenFile import Token
 from UsersFile import User, Users
 
 
-
-
 class Handler:
 
-    def __init__(self, users: Users):
+    def __init__(self, users: Users, cafes: Cafes, media_files: MediaFiles, cafes_reviews: Reviews):
+        self._cafes_reviews = cafes_reviews
+        self._media_files = media_files
         self._users = users
+        self._cafes = cafes
 
     def handle_request(self, req: Request):
         user_login = None
@@ -27,6 +29,8 @@ class Handler:
                 return HTTPError(403, "Forbidden", body=("token must have key " + str(ke)).encode())
             except Exception as e:
                 return HTTPError(403, "Forbidden", body=str(e).encode())
+
+        print(req.path, req.query, req.url)
 
         if req.path == '/users' and req.method == 'POST':
             return self.handle_post_users(req)
@@ -39,44 +43,43 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_users(req, user_login)
 
-        #TODO
-        if req.path == '/cafes' and req.method == 'GET': #withMeanStars
+        # TODO
+        if req.path == '/cafes' and req.method == 'GET':  # withMeanStars
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafes(req)
 
-        if req.path == '/cafemedia' and req.method == 'GET':#WithReviews
+        if req.path == '/cafe/media' and req.method == 'GET':  # WithReviews
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafe_media(req)
 
-        if req.path == '/delcafemedia' and req.method == 'POST':
-            if user_login is None:
-                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_edit_cafe(req)
-
-        if req.path == '/addcafemedia' and req.method == 'POST':
+        if req.path == '/cafe/media' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_cafe_media(req)
 
-        if req.path == '/createcafe' and req.method == 'POST':
+        if req.path == '/cafe/media' and req.method == 'DELETE':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_create_cafe(req)
+            return self.handle_del_cafe_media(req)
 
-        if req.path == '/editcafe' and req.method == 'POST':
+        if req.path == '/cafe' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_edit_cafe(req)
+            return self.handle_put_cafe(req)
 
+        # if req.path == '/cafe' and req.method == 'POST':
+        #     if user_login is None:
+        #         return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+        #     return self.handle_edit_cafe(req)
 
-        if req.path == '/addreview' and req.method == 'POST':
+        if req.path == '/cafe/review' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_review(req)
 
-        if req.path == '/delreview' and req.method == 'POST':
+        if req.path == '/cafe/review' and req.method == 'DELETE':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_review(req)
@@ -88,7 +91,7 @@ class Handler:
 
         raise HTTPError(404, 'Not found')
 
-     #TODO
+    # TODO
     def handle_get_cafes(self, req):
         accept = req.headers.get('Accept')
 
@@ -107,24 +110,28 @@ class Handler:
     def handle_get_cafe_media(self, req):
         pass
 
-    def handle_create_cafe(self, req):
-        pass
-
-    def handle_edit_cafe(self, req):
-        pass
+    def handle_put_cafe(self, req: Request):
+        cafe = Handler.read_cafe_from_req_body(req)
+        self._cafes.put(cafe)
+        return Response(204, 'Created', body=cafe)
 
     def handle_del_cafe_media(self, req):
         pass
 
     def handle_add_review(self, req):
-        pass
+        review = Handler.read_cafe_review_from_req_body(req)
+        self._cafes_reviews.put(review)
+        return Response(204, 'Created', body=review)
 
     def handle_del_review(self, req):
         pass
 
     def handle_add_cafe_media(self, req):
-        pass
-
+        tp = req.query["type"][0]
+        cafe_id = req.query["cafe_id"][0]
+        mf = MediaFile(int(cafe_id), tp)
+        mf = self._media_files.put(mf, req.body())
+        return Response(204, 'Created', body=mf)
 
     def handle_post_users(self, req):
         user = self.read_user_from_request_body(req)
@@ -139,15 +146,14 @@ class Handler:
 
         if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
-            body = json.dumps(self._users.__dict__)
-
+            body = json.dumps([v.__dict__ for (k, v) in self._users._users.items()])
         else:
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
             return Response(406, 'Not Acceptable')
 
         body = body.encode('utf-8')
-        headers = [('Content-Type', contentType),
-                   ('Content-Length', len(body))]
+        headers = {'Content-Type': contentType,
+                   'Content-Length': len(body)}
         return Response(200, 'OK', headers, body)
 
     def handle_get_user(self, req, user_id):
@@ -187,13 +193,46 @@ class Handler:
 
     @staticmethod
     def read_user_from_request_body(req) -> User:
-        bb = req.body()
-        print(bb)
-        body = json.loads(bb)
-        print("body: " + str(body))
-
+        body = json.loads(req.body())
         user = User()
         user.id = None
         user.login = body["login"]
         user.password = body["password"]
         return user
+
+    @staticmethod
+    def read_cafe_from_req_body(req) -> Cafe:
+        body = json.loads(req.body())
+        return Cafe(
+            body["owner"],
+            body["name"],
+            body["des"],
+            body["city"],
+            id=Handler.get_int_or_none(body, "id"),
+        )
+
+    @staticmethod
+    def read_cafe_review_from_req_body(req) -> Review:
+        body = json.loads(req.body())
+        return Review(
+            body["owner"],
+            int(body["cafe_id"]),
+            int(body["stars"]),
+            now(),
+            body["description"],
+
+        )
+
+    @staticmethod
+    def get_or_none(body, key: str) -> Optional[str]:
+        try:
+            return body[key]
+        except KeyError:
+            return None
+
+    @staticmethod
+    def get_int_or_none(body, key: str) -> Optional[int]:
+        try:
+            return int(body[key])
+        except KeyError:
+            return None
