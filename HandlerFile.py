@@ -55,6 +55,11 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_edit_cafe(req)
 
+        if req.path == '/addcafemedia' and req.method == 'POST':
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_add_cafe_media(req)
+
         if req.path == '/createcafe' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
@@ -117,6 +122,8 @@ class Handler:
     def handle_del_review(self, req):
         pass
 
+    def handle_add_cafe_media(self, req):
+        pass
 
 
     def handle_post_users(self, req):
