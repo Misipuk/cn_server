@@ -46,12 +46,14 @@ class Users:
                 user.id = self._all_users[-1].id + 1
             else:
                 user.id = 1
-
-        # To dict
-        self._users[user.id] = user
-        self._users_login[user.login] = user.id
-        # To_list
-        self._all_users.append(user)
+        if self._users_login.get(user.login) is None:
+            # To dict
+            self._users[user.id] = user
+            self._users_login[user.login] = user.id
+            # To_list
+            self._all_users.append(user)
+        else:
+            return -1
 
         return user.id
 

@@ -137,7 +137,8 @@ class Handler:
         user = self.read_user_from_request_body(req)
         _ = self._users.put(user)
         user = user.copy()
-
+        if _ == -1:
+            return HTTPError(403, 'Forbidden')
         user.password = None
         return Response(204, 'Created', body=user)
 
