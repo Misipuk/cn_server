@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # vim:fileencoding=utf-8
 import datetime
@@ -60,7 +59,7 @@ def fill_reviews(reviews: Reviews):
 
 if __name__ == '__main__':
     host = ''
-    port = 9091
+    port = 9090
     name = 'MyServer'
 
     users = Users()

@@ -57,17 +57,17 @@ class Handler:
         if req.path == '/cafe/media' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_add_cafe_media(req)
+            return self.handle_add_cafe_media(req, user_login)
 
         if req.path == '/cafe/media' and req.method == 'DELETE': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_cafe_media(req)
 
-        if req.path == '/cafe' and req.method == 'POST': #LOGIN CHECK
+        if req.path == '/cafe' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_put_cafe(req)
+            return self.handle_put_cafe(req, user_login)
 
         # if req.path == '/cafe' and req.method == 'POST':
         #     if user_login is None:
@@ -82,12 +82,12 @@ class Handler:
         if req.path == '/cafe/review' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_add_review(req)
+            return self.handle_add_review(req, user_login)
 
         if req.path == '/cafe/review' and req.method == 'DELETE': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_del_review(req)
+            return self.handle_del_review(req, user_login)
 
         """if req.path.startswith('/users/'):
             user_id = req.path[len('/users/'):]
@@ -131,9 +131,11 @@ class Handler:
     def handle_get_cafe_media(self, req):
         pass
 
-    def handle_put_cafe(self, req: Request):
+    def handle_put_cafe(self, req: Request, login: str):
         cafe = Handler.read_cafe_from_req_body(req)
+        cafe.owner = login
         b = self._cafes.put(cafe)
+        #TODO
         if b == -1:
             return HTTPError(403, 'Forbidden')
         return Response(204, 'Created', body=cafe)
@@ -142,23 +144,28 @@ class Handler:
     def handle_del_cafe_media(self, req):
         pass
 
-    def handle_add_review(self, req):
+    def handle_add_review(self, req, login: str):
         review = Handler.read_cafe_review_from_req_body(req)
+        review.owner = login
         self._cafes_reviews.put(review)
         return Response(204, 'Created', body=review)
 
     #TODO
-    def handle_del_review(self, req):
+    def handle_del_review(self, req, login: str):
         rev_id = req.query["rev_id"][0]
-        us_log = req.query["us_log"][0]
+        us_log = login
         self._cafes_reviews.del_by_userlogin(us_log, int(rev_id))
         #mf = MediaFile(int(cafe_id), tp)
         #mf = self._media_files.put(mf, req.body())
         return Response(204, 'Deleted')
 
-    def handle_add_cafe_media(self, req):
+    def handle_add_cafe_media(self, req, login: str):
         tp = req.query["type"][0]
         cafe_id = req.query["cafe_id"][0]
+        id_check = self._cafes._owner_login.get(login)
+        #print("id = "+str(id_check))
+        if id_check != int(cafe_id):
+            return HTTPError(403, 'Forbidden')
         mf = MediaFile(int(cafe_id), tp)
         mf = self._media_files.put(mf, req.body())
         return Response(204, 'Created', body=mf)
