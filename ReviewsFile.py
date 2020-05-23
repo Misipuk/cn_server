@@ -39,22 +39,7 @@ class Reviews:
         self._cafe_reviews = {}
         self._login_reviews = {}
         self._all_reviews = []
-        r1 = Review('PanAleha', 3, 5, now(), 'Вкусный осетр', )
-        r2 = Review('PanAleha', 1, 3, now(), 'Ребята, пирожки у них просто невероятные!', )
-        r3 = Review('VasyaPupkin', 1, 5, now(), 'Мясная пицца лучшая :)', )
-        r4 = Review('VasyaPupkin', 2, 5, now(), 'У них на сцене поющая уточка, вечер удался)))', )
-        r5 = Review('LesyaSuper', 2, 2, now(), 'Долго обслуживали, разве что крякали прикольно', )
-        r6 = Review('LesyaSuper', 3, 1, now(), 'Да это не из осетра, а из карася!!!', )
-        r7 = Review('MrMops', 3, 5, now(), 'Изысканная кухня', )
-        r8 = Review('MrMops', 1, 4, now(), 'Пирожок был еле теплый, но все равно вкусно', )
-        self.put(r1)
-        self.put(r2)
-        self.put(r3)
-        self.put(r4)
-        self.put(r5)
-        self.put(r6)
-        self.put(r7)
-        self.put(r8)
+
 
     def get_by_cafe(self, cid: int) -> Optional[List[Review]]:
         rvs = self._cafe_reviews.get(cid)

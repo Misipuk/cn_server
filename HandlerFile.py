@@ -74,6 +74,11 @@ class Handler:
         #         return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
         #     return self.handle_edit_cafe(req)
 
+        if req.path == '/cafes/review' and req.method == 'GET': #TODO AUTH
+            if user_login is None:
+                return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
+            return self.handle_get_reviews(req)
+
         if req.path == '/cafe/review' and req.method == 'POST': #TODO AUTH
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
@@ -91,7 +96,22 @@ class Handler:
 
         raise HTTPError(404, 'Not found')
 
-    # TODO
+    def handle_get_reviews(self, req):
+        cafe_id = req.query["cafe_id"][0]
+        accept = req.headers.get('Accept')
+
+        if 'application/json' in accept:
+            contentType = 'application/json; charset=utf-8'
+            body = json.dumps([v.__dict__ for v in self._cafes_reviews._cafe_reviews.get(int(cafe_id))])
+        else:
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
+            return Response(406, 'Not Acceptable')
+
+        body = body.encode('utf-8')
+        headers = {'Content-Type': contentType,
+                   'Content-Length': len(body)}
+        return Response(200, 'OK', headers, body)
+
     def handle_get_cafes(self, req):
         accept = req.headers.get('Accept')
 
@@ -107,6 +127,7 @@ class Handler:
                    'Content-Length': len(body)}
         return Response(200, 'OK', headers, body)
 
+    #TODO
     def handle_get_cafe_media(self, req):
         pass
 
@@ -117,6 +138,7 @@ class Handler:
             return HTTPError(403, 'Forbidden')
         return Response(204, 'Created', body=cafe)
 
+    #TODO
     def handle_del_cafe_media(self, req):
         pass
 
@@ -125,6 +147,7 @@ class Handler:
         self._cafes_reviews.put(review)
         return Response(204, 'Created', body=review)
 
+    #TODO
     def handle_del_review(self, req):
         pass
 

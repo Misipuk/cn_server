@@ -1,8 +1,10 @@
+import datetime
+
 from CafesFile import Cafes, Cafe
 from HandlerFile import Users, Handler
 from MediaFileClass import MediaFiles
 from MyHTTPServerFile import MyHTTPServer
-from ReviewsFile import Reviews
+from ReviewsFile import Reviews, Review
 from UsersFile import User
 
 
@@ -31,6 +33,27 @@ def fill_cafes(cafes: Cafes):
      cafes.put(c2)
      cafes.put(c3)
 
+def now() -> str:
+    return str(datetime.datetime.now())
+
+def fill_reviews(reviews: Reviews):
+    r1 = Review('PanAleha', 3, 5, now(), 'Вкусный осетр', )
+    r2 = Review('PanAleha', 1, 3, now(), 'Ребята, пирожки у них просто невероятные!', )
+    r3 = Review('VasyaPupkin', 1, 5, now(), 'Мясная пицца лучшая :)', )
+    r4 = Review('VasyaPupkin', 2, 5, now(), 'У них на сцене поющая уточка, вечер удался)))', )
+    r5 = Review('LesyaSuper', 2, 2, now(), 'Долго обслуживали, разве что крякали прикольно', )
+    r6 = Review('LesyaSuper', 3, 1, now(), 'Да это не из осетра, а из карася!!!', )
+    r7 = Review('MrMops', 3, 5, now(), 'Изысканная кухня', )
+    r8 = Review('MrMops', 1, 4, now(), 'Пирожок был еле теплый, но все равно вкусно', )
+    reviews.put(r1)
+    reviews.put(r2)
+    reviews.put(r3)
+    reviews.put(r4)
+    reviews.put(r5)
+    reviews.put(r6)
+    reviews.put(r7)
+    reviews.put(r8)
+
 
 if __name__ == '__main__':
     host = ''
@@ -44,6 +67,7 @@ if __name__ == '__main__':
 
     fill_users(users)
     fill_cafes(cafes)
+    fill_reviews(cafe_reviews)
 
     handler = Handler(users, cafes, media_files, cafe_reviews)
 
@@ -55,3 +79,6 @@ if __name__ == '__main__':
 
 # TODO:
 # 1. replace len(...) in repositories (CafesFile, ...)
+
+
+
