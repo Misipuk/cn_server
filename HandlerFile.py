@@ -49,12 +49,12 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafes(req)
 
-        if req.path == '/cafe/media' and req.method == 'GET': #TODO # WithReviews
+        if req.path == '/cafe/media' and req.method == 'GET': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafe_media(req)
 
-        if req.path == '/cafe/media' and req.method == 'POST': #TODO AUTH
+        if req.path == '/cafe/media' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_cafe_media(req)
@@ -74,12 +74,12 @@ class Handler:
         #         return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
         #     return self.handle_edit_cafe(req)
 
-        if req.path == '/cafes/review' and req.method == 'GET': #TODO AUTH
+        if req.path == '/cafe/review' and req.method == 'GET':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_reviews(req)
 
-        if req.path == '/cafe/review' and req.method == 'POST': #TODO AUTH
+        if req.path == '/cafe/review' and req.method == 'POST':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_review(req)
@@ -149,7 +149,12 @@ class Handler:
 
     #TODO
     def handle_del_review(self, req):
-        pass
+        rev_id = req.query["rev_id"][0]
+        us_log = req.query["us_log"][0]
+        self._cafes_reviews.del_by_userlogin(us_log, int(rev_id))
+        #mf = MediaFile(int(cafe_id), tp)
+        #mf = self._media_files.put(mf, req.body())
+        return Response(204, 'Deleted')
 
     def handle_add_cafe_media(self, req):
         tp = req.query["type"][0]

@@ -75,12 +75,25 @@ class Reviews:
         return review.id
 
     def del_by_userlogin(self, login: str, revid: int):
-        for rev in self._all_reviews:
-            if rev.id == revid and rev.owner == login:
-                self._cafe_reviews.get(rev.cafeid).remove(rev)  # QUESTION
-                self._login_reviews.get(login).remove(rev)
-                self._all_reviews.remove(rev)
+            cafeid = -1
+            try:
+                for rev in self._all_reviews:
+                    if rev.id == revid and rev.owner == login:
+                        cafeid = rev.cafeid
+                        self._all_reviews.remove(rev)
+
+                cl = self._cafe_reviews.get(cafeid)  # QUESTION
+                for rev in cl:
+                    if rev.id == revid and rev.owner == login:
+                        cl.remove(rev)
+                c2 = self._login_reviews.get(login)
+                for rev in c2:
+                    if rev.id == revid and rev.owner == login:
+                        c2.remove(rev)
+
                 return 1
+            except Exception as e:
+                return -1
             else:
                 return -1
 
