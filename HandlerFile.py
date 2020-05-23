@@ -32,39 +32,39 @@ class Handler:
 
         print(req.path, req.query, req.url)
 
-        if req.path == '/users' and req.method == 'POST':
+        if req.path == '/users' and req.method == 'POST':#REGISTRATION
             return self.handle_post_users(req)
 
-        if req.path == '/login' and req.method == 'POST':
+        if req.path == '/login' and req.method == 'POST':#LOGIN
             return self.handle_login_user(req)
 
-        if req.path == '/users' and req.method == 'GET':
+        if req.path == '/users' and req.method == 'GET':#GET ALL USERS LIST
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_users(req, user_login)
 
-        # TODO
-        if req.path == '/cafes' and req.method == 'GET':  # withMeanStars
+
+        if req.path == '/cafes' and req.method == 'GET': #TODO # withMeanStars
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafes(req)
 
-        if req.path == '/cafe/media' and req.method == 'GET':  # WithReviews
+        if req.path == '/cafe/media' and req.method == 'GET': #TODO # WithReviews
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafe_media(req)
 
-        if req.path == '/cafe/media' and req.method == 'POST':
+        if req.path == '/cafe/media' and req.method == 'POST': #TODO AUTH
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_cafe_media(req)
 
-        if req.path == '/cafe/media' and req.method == 'DELETE':
+        if req.path == '/cafe/media' and req.method == 'DELETE': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_cafe_media(req)
 
-        if req.path == '/cafe' and req.method == 'POST':
+        if req.path == '/cafe' and req.method == 'POST': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_put_cafe(req)
@@ -74,12 +74,12 @@ class Handler:
         #         return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
         #     return self.handle_edit_cafe(req)
 
-        if req.path == '/cafe/review' and req.method == 'POST':
+        if req.path == '/cafe/review' and req.method == 'POST': #TODO AUTH
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_review(req)
 
-        if req.path == '/cafe/review' and req.method == 'DELETE':
+        if req.path == '/cafe/review' and req.method == 'DELETE': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_review(req)
@@ -112,7 +112,9 @@ class Handler:
 
     def handle_put_cafe(self, req: Request):
         cafe = Handler.read_cafe_from_req_body(req)
-        self._cafes.put(cafe)
+        b = self._cafes.put(cafe)
+        if b == -1:
+            return HTTPError(403, 'Forbidden')
         return Response(204, 'Created', body=cafe)
 
     def handle_del_cafe_media(self, req):

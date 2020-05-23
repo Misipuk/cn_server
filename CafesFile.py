@@ -53,9 +53,12 @@ class Cafes:
     def put(self, cafe: Cafe) -> int:
         if cafe.id is None:
             cafe.id = len(self._cafes) + 1
-        # To dict
-        self._cafes[cafe.id] = cafe
-        self._owner_login[cafe.owner] = cafe.id
+        if self._owner_login.get(cafe.owner) is None:
+            # To dict
+            self._cafes[cafe.id] = cafe
+            self._owner_login[cafe.owner] = cafe.id
+        else:
+            return -1
 
         return cafe.id
 
