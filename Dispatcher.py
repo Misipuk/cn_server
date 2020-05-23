@@ -1,9 +1,10 @@
-from CafesFile import Cafes
+from CafesFile import Cafes, Cafe
 from HandlerFile import Users, Handler
 from MediaFileClass import MediaFiles
 from MyHTTPServerFile import MyHTTPServer
 from ReviewsFile import Reviews
 from UsersFile import User
+
 
 
 def fill_users(users: Users):
@@ -22,6 +23,14 @@ def fill_users(users: Users):
     users.put(u6)
     users.put(u7)
 
+def fill_cafes(cafes: Cafes):
+     c1 = Cafe('PizzaOwner', 'PizzaDay', 'Very tasty pizza', 'Dnepr')
+     c2 = Cafe('PubOwner', 'Duck Pub', 'We have cool tea', 'Kiev')
+     c3 = Cafe('SushiOwner', 'Sushi Iz Karasya', 'Only Japan Fish', 'Cherkasi')
+     cafes.put(c1)
+     cafes.put(c2)
+     cafes.put(c3)
+
 
 if __name__ == '__main__':
     host = ''
@@ -34,6 +43,7 @@ if __name__ == '__main__':
     cafe_reviews = Reviews()
 
     fill_users(users)
+    fill_cafes(cafes)
 
     handler = Handler(users, cafes, media_files, cafe_reviews)
 

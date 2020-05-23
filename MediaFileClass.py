@@ -69,7 +69,10 @@ class MediaFiles:
             self._all_files.append(mf)
         else:
             self._all_files = [mf]
+
+        #store_image
         self._store_image(mf, body)
+
         # To dict
         if self._cafe_files.get(mf.cafeid) is not None:
             self._cafe_files[mf.cafeid] = self._cafe_files[mf.cafeid] + [mf]

@@ -38,7 +38,7 @@ class Handler:
         if req.path == '/login' and req.method == 'POST':#LOGIN
             return self.handle_login_user(req)
 
-        if req.path == '/users' and req.method == 'GET':#GET ALL USERS LIST
+        if req.path == '/users' and req.method == 'GET': #GET ALL USERS LIST
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_users(req, user_login)
@@ -84,10 +84,10 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_review(req)
 
-        if req.path.startswith('/users/'):
+        """if req.path.startswith('/users/'):
             user_id = req.path[len('/users/'):]
             if user_id.isdigit():
-                return self.handle_get_user(req, user_id)
+                return self.handle_get_user(req, user_id)"""
 
         raise HTTPError(404, 'Not found')
 
@@ -97,14 +97,14 @@ class Handler:
 
         if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
-            body = json.dumps(self._users.__dict__)
+            body = json.dumps([v.__dict__ for (k, v) in self._cafes._cafes.items()])
         else:
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
             return Response(406, 'Not Acceptable')
 
         body = body.encode('utf-8')
-        headers = [('Content-Type', contentType),
-                   ('Content-Length', len(body))]
+        headers = {'Content-Type': contentType,
+                   'Content-Length': len(body)}
         return Response(200, 'OK', headers, body)
 
     def handle_get_cafe_media(self, req):
