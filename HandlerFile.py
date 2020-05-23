@@ -129,7 +129,20 @@ class Handler:
 
     #TODO
     def handle_get_cafe_media(self, req):
-        pass
+        cafe_id = req.query["cafe_id"][0]
+        accept = req.headers.get('Accept')
+
+        if 'application/json' in accept:
+            contentType = 'application/json; charset=utf-8'
+            body = json.dumps([v.__dict__ for v in self._media_files.get(int(cafe_id))])
+        else:
+            # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
+            return Response(406, 'Not Acceptable')
+
+        body = body.encode('utf-8')
+        headers = {'Content-Type': contentType,
+                   'Content-Length': len(body)}
+        return Response(200, 'OK', headers, body)
 
     def handle_put_cafe(self, req: Request, login: str):
         cafe = Handler.read_cafe_from_req_body(req)

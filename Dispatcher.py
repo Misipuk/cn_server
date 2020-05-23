@@ -4,7 +4,7 @@ import datetime
 
 from CafesFile import Cafes, Cafe
 from HandlerFile import Users, Handler
-from MediaFileClass import MediaFiles
+from MediaFileClass import MediaFiles, MediaFile
 from MyHTTPServerFile import MyHTTPServer
 from ReviewsFile import Reviews, Review
 from UsersFile import User
@@ -34,6 +34,10 @@ def fill_cafes(cafes: Cafes):
      cafes.put(c1)
      cafes.put(c2)
      cafes.put(c3)
+
+def fill_media(mfiles: MediaFiles):
+    m1 = MediaFile(1, "photo")
+    mfiles.put_init(m1)
 
 def now() -> str:
     return str(datetime.datetime.now())
@@ -70,6 +74,7 @@ if __name__ == '__main__':
     fill_users(users)
     fill_cafes(cafes)
     fill_reviews(cafe_reviews)
+    fill_media(media_files)
 
     handler = Handler(users, cafes, media_files, cafe_reviews)
 

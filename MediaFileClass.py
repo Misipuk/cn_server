@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 import os
+import base64
 
 PHOTO = "photo"
 VIDEO = "video"
@@ -14,6 +15,7 @@ class MediaFile:
         self.id = None
         self.cafeid = cafeid
         self.type = type
+        self.bcd = None
         pass
 
     def generate_path(self):
@@ -37,8 +39,11 @@ class MediaFile:
     def copy(self):
         mf = MediaFile(self.cafeid, self.type)
         mf.id = self.id
+        mf.bcd = self.bcd
         return mf
 
+def b64_encode(b: bytes) -> bytes:
+    return base64.urlsafe_b64encode(b)
 
 class MediaFiles:
     # cafe_id -> list of MediaFiles
@@ -51,11 +56,40 @@ class MediaFiles:
 
     def get(self, cid: int) -> Optional[List[MediaFile]]:
         mfl = self._cafe_files.get(cid)
-        # image_data = open('photos/'+mf.id, 'rb')
-        # bytes = image_data.read()
+        if mfl is None:
+            return None
+        for fl in mfl:
+            path = fl.generate_path()
+            with open(path, mode='rb') as f:
+                fl.bcd = b64_encode(f.read()).decode()
         return MediaFiles._copy_if_none(mfl)
 
     def put(self, mf: MediaFile, body) -> MediaFile:
+        if mf.id is None:
+            if len(self._all_files) != 0:
+                mf.id = len(self._all_files) + 1
+            else:
+                mf.id = 1
+
+        # image_data = open('photos/'+mf.id, 'rb')
+        # bytes = image_data.write() ?
+        # To list
+        if len(self._all_files)!=0:
+            self._all_files.append(mf)
+        else:
+            self._all_files = [mf]
+
+        #store_image
+        self._store_image(mf, body)
+
+        # To dict
+        if self._cafe_files.get(mf.cafeid) is not None:
+            self._cafe_files[mf.cafeid] = self._cafe_files[mf.cafeid] + [mf]
+        else:
+            self._cafe_files[mf.cafeid] = [mf]
+        return mf
+
+    def put_init(self, mf: MediaFile) -> MediaFile:
         if mf.id is None:
             if len(self._all_files) != 0:
                 mf.id = len(self._all_files) + 1
@@ -69,9 +103,6 @@ class MediaFiles:
             self._all_files.append(mf)
         else:
             self._all_files = [mf]
-
-        #store_image
-        self._store_image(mf, body)
 
         # To dict
         if self._cafe_files.get(mf.cafeid) is not None:
@@ -88,11 +119,15 @@ class MediaFiles:
     def delete_by_cafeid(self, cafeid: int, fileid: int):
         for mf in self._all_files:
             if mf.id == fileid and mf.cafeid == cafeid:
-                self._cafe_files.get(mf.cafeid).remove(mf)  # QUESTION
                 self._all_files.remove(mf)
+                os.remove(mf.generate_path())
+
+        lst = self._cafe_files.get(mf.cafeid)
+        for mf in lst:
+            if mf.id == fileid and mf.cafeid == cafeid:
+                lst.remove(mf)
                 return 1
-            else:
-                return -1
+        return -1
 
     @staticmethod
     def _copy_if_none(mf: List[MediaFile]):
