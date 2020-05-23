@@ -134,10 +134,13 @@ class Handler:
     def handle_put_cafe(self, req: Request, login: str):
         cafe = Handler.read_cafe_from_req_body(req)
         cafe.owner = login
+        id_check = self._cafes._owner_login.get(login)
+        # print("id = "+str(id_check))
+        if id_check != None:
+            cafe.id = id_check
         b = self._cafes.put(cafe)
-        #TODO
-        if b == -1:
-            return HTTPError(403, 'Forbidden')
+        #if b == -1:
+           # return HTTPError(403, 'Forbidden')
         return Response(204, 'Created', body=cafe)
 
     #TODO

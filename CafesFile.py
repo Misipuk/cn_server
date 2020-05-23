@@ -58,7 +58,7 @@ class Cafes:
             self._cafes[cafe.id] = cafe
             self._owner_login[cafe.owner] = cafe.id
         else:
-            return -1
+            self._cafes[cafe.id] = cafe
 
         return cafe.id
 
