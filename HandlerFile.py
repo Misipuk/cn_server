@@ -64,7 +64,7 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_cafe_media(req)
 
-        if req.path == '/cafe' and req.method == 'POST': #TODO
+        if req.path == '/cafe' and req.method == 'POST': #LOGIN CHECK
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_put_cafe(req)

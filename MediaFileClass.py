@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+import os
 
 PHOTO = "photo"
 VIDEO = "video"
@@ -17,9 +18,19 @@ class MediaFile:
 
     def generate_path(self):
         if self.type == PHOTO:
-            return "./photos/" + str(self.id) + ".jpg"
+             if os.path.isdir("./photos/" + str(self.cafeid)):
+                return "./photos/" + str(self.cafeid) + "/" + str(self.id) + ".jpg"
+             else:
+                 os.mkdir("./photos/" + str(self.cafeid))
+                 return "./photos/" + str(self.cafeid) + "/" + str(self.id) + ".jpg"
+
         elif self.type == VIDEO:
-            return "./videos/" + str(self.id) + ".mov"
+            if os.path.isdir("./videos/" + str(self.cafeid)):
+                return "./videos/" + str(self.cafeid) + "/" + str(self.id) + ".mov"
+            else:
+                os.mkdir("./videos/" + str(self.cafeid))
+                return "./videos/" + str(self.cafeid) + "/" + str(self.id) + ".mov"
+
         else:
             raise Exception("unknown type")
 
