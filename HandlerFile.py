@@ -44,12 +44,12 @@ class Handler:
             return self.handle_get_users(req, user_login)
 
 
-        if req.path == '/cafes' and req.method == 'GET': #TODO # withMeanStars
+        if req.path == '/cafes' and req.method == 'GET':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafes(req)
 
-        if req.path == '/cafe/media' and req.method == 'GET': #TODO
+        if req.path == '/cafe/media' and req.method == 'GET':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_get_cafe_media(req)
@@ -62,7 +62,7 @@ class Handler:
         if req.path == '/cafe/media' and req.method == 'DELETE': #TODO
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
-            return self.handle_del_cafe_media(req)
+            return self.handle_del_cafe_media(req, user_login)
 
         if req.path == '/cafe' and req.method == 'POST':
             if user_login is None:
@@ -84,7 +84,7 @@ class Handler:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_add_review(req, user_login)
 
-        if req.path == '/cafe/review' and req.method == 'DELETE': #TODO
+        if req.path == '/cafe/review' and req.method == 'DELETE':
             if user_login is None:
                 return HTTPError(403, "Forbidden", body="authorization header is absent".encode())
             return self.handle_del_review(req, user_login)
@@ -127,13 +127,15 @@ class Handler:
                    'Content-Length': len(body)}
         return Response(200, 'OK', headers, body)
 
-    #TODO
+
     def handle_get_cafe_media(self, req):
         cafe_id = req.query["cafe_id"][0]
         accept = req.headers.get('Accept')
 
         if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
+            if self._media_files.get(int(cafe_id)) is None:
+                return Response(200, 'OK')
             body = json.dumps([v.__dict__ for v in self._media_files.get(int(cafe_id))])
         else:
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
@@ -157,8 +159,15 @@ class Handler:
         return Response(204, 'Created', body=cafe)
 
     #TODO
-    def handle_del_cafe_media(self, req):
-        pass
+    def handle_del_cafe_media(self, req, login: str):
+        file_id = req.query["file_id"][0]
+        cafe_id = req.query["cafe_id"][0]
+        id_check = self._cafes._owner_login.get(login)
+        # print("id = "+str(id_check))
+        if id_check != int(cafe_id):
+            return HTTPError(403, 'Forbidden')
+        self._media_files.delete_by_cafeid(int(cafe_id), int(file_id))
+        return Response(204, 'Deleted')
 
     def handle_add_review(self, req, login: str):
         review = Handler.read_cafe_review_from_req_body(req)
@@ -166,7 +175,7 @@ class Handler:
         self._cafes_reviews.put(review)
         return Response(204, 'Created', body=review)
 
-    #TODO
+
     def handle_del_review(self, req, login: str):
         rev_id = req.query["rev_id"][0]
         us_log = login

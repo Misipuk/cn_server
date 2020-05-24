@@ -123,11 +123,12 @@ class MediaFiles:
                 os.remove(mf.generate_path())
 
         lst = self._cafe_files.get(mf.cafeid)
+        if lst is None:
+            return -1
         for mf in lst:
             if mf.id == fileid and mf.cafeid == cafeid:
                 lst.remove(mf)
                 return 1
-        return -1
 
     @staticmethod
     def _copy_if_none(mf: List[MediaFile]):
