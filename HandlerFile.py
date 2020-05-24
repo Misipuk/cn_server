@@ -102,6 +102,8 @@ class Handler:
 
         if 'application/json' in accept:
             contentType = 'application/json; charset=utf-8'
+            if (self._cafes_reviews._cafe_reviews.get(int(cafe_id))) is None:
+                return Response(404, 'No Reviews')
             body = json.dumps([v.__dict__ for v in self._cafes_reviews._cafe_reviews.get(int(cafe_id))])
         else:
             # https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406
