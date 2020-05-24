@@ -15,11 +15,11 @@ def sha256(s: str) -> bytes:
 
 
 def b64_encode(b: bytes) -> bytes:
-    return base64.urlsafe_b64encode(b)
+    return base64.standard_b64encode(b)
 
 
 def b64_decode(s: str) -> bytes:
-    return base64.urlsafe_b64decode(s.encode())
+    return base64.standard_b64decode(s.encode())
 
 
 class Token:

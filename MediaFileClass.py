@@ -2,6 +2,8 @@ from typing import Dict, List, Optional
 import os
 import base64
 
+from TokenFile import b64_encode
+
 PHOTO = "photo"
 VIDEO = "video"
 
@@ -41,9 +43,6 @@ class MediaFile:
         mf.id = self.id
         mf.bcd = self.bcd
         return mf
-
-def b64_encode(b: bytes) -> bytes:
-    return base64.urlsafe_b64encode(b)
 
 class MediaFiles:
     # cafe_id -> list of MediaFiles
